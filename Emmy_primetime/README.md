@@ -1,4 +1,4 @@
-# 艾美獎黃金時段欄位需求
+# 艾美獎黃金時段獎項欄位需求
 以下格式待整理
 ## Programs
 * Outstanding Comedy Series
