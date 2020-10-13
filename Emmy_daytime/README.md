@@ -24,14 +24,14 @@ Daytime Emmys are awarded in the following categories:
 
 Acting
 
-    Outstanding Lead Actor in a Drama Series
-    Outstanding Lead Actress in a Drama Series
-    Outstanding Supporting Actor in a Drama Series
-    Outstanding Supporting Actress in a Drama Series
-    Outstanding Younger Performer in a Drama Series (starting in 2020, replacing these two categories:)[9]
-        Outstanding Younger Actor in a Drama Series (1985–2019)[9]
-        Outstanding Younger Actress in a Drama Series (1985–2019)[9]
-    Outstanding Special Guest Performer in a Drama Series
+* Outstanding Lead Actor in a Drama Series
+* Outstanding Lead Actress in a Drama Series
+* Outstanding Supporting Actor in a Drama Series
+* Outstanding Supporting Actress in a Drama Series
+* Outstanding Younger Performer in a Drama Series (starting in 2020, replacing these two categories:)[9]
+* Outstanding Younger Actor in a Drama Series (1985–2019)[9]
+* Outstanding Younger Actress in a Drama Series (1985–2019)[9]
+* Outstanding Special Guest Performer in a Drama Series
 
 Hosting
 
