@@ -7,3 +7,31 @@
 
   範例: imdb 影集基本資料
   imdb_shows
+  
+# 艾美獎欄位需求
+* Primetime 孟遷
+* Daytime 士紳
+* Sports 士紳
+* News and Documentary 孟遷
+* Engineering 怡伶
+* Regional 怡伶
+
+# rotten tomato 評論
+
+ * 評論 柏翰
+
+# imdb 影集資料欄位需求 益銘
+
+* 片名
+* 評分
+* 集數
+* 導演
+* 製作人
+* 演員
+* 年份
+* 類型
+* 分級
+* 國家
+* 語言
+* 拍攝地點(國家 + 州/省/縣)
+* 製作公司
