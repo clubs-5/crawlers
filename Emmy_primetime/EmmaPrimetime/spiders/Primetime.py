@@ -42,8 +42,8 @@ class PrimetimeSpider(scrapy.Spider):
                    data['title'] = title.css('.event-widgets__award-category-name').css('::text').extract()
 
             yield data
-'''
-        next_pages = "https://m.imdb.com/event/ev0000223/"+str(PrimetimeSpider.page_year)+"/1/?ref_=ev_eh"
+
+         next_pages = "https://m.imdb.com/event/ev0000223/"+str(PrimetimeSpider.page_year)+"/1/?ref_=ev_eh"
 
         if PrimetimeSpider.page_year >=1940:
                 PrimetimeSpider.page_year -=1
@@ -51,7 +51,7 @@ class PrimetimeSpider(scrapy.Spider):
         yield SplashRequest(url=next_pages,callback=self.parse,args={"wait":5})
         yield response.follow(next_pages, callback=self.parse)
 
-'''
+
 
 #
 '''
