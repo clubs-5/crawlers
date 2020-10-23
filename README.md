@@ -9,7 +9,7 @@
   imdb_shows
   
 # 艾美獎欄位需求
-* Primetime 孟遷 #6
+* Primetime #6
 * Daytime 士紳
 * Sports 士紳
 * News and Documentary 孟遷
