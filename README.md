@@ -20,6 +20,7 @@
 
  * 評論 柏翰 https://github.com/clubs-5/crawlers/issues/10
 
-# imdb 影集資料欄位需求 益銘 https://github.com/clubs-5/crawlers/issues/1
+# imdb 影集資料欄位需求 
+益銘 https://github.com/clubs-5/crawlers/issues/1
 
 
