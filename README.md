@@ -10,28 +10,16 @@
   
 # 艾美獎欄位需求
 * Primetime https://github.com/clubs-5/crawlers/issues/6
-* Daytime 士紳
-* Sports 士紳
-* News and Documentary 孟遷
+* Daytime 士紳 https://github.com/clubs-5/crawlers/issues/4
+* Sports 士紳 https://github.com/clubs-5/crawlers/issues/8
+* News and Documentary 孟遷 https://github.com/clubs-5/crawlers/issues/5
 * ~~Engineering 怡伶~~
-* Regional 怡伶
+* Regional 怡伶 https://github.com/clubs-5/crawlers/issues/7
 
 # rotten tomato 評論
 
- * 評論 柏翰
+ * 評論 柏翰 https://github.com/clubs-5/crawlers/issues/10
 
-# imdb 影集資料欄位需求 益銘
+# imdb 影集資料欄位需求 益銘 https://github.com/clubs-5/crawlers/issues/1
 
-* 片名
-* 評分
-* 集數
-* 導演
-* 製作人
-* 演員
-* 年份
-* 類型
-* 分級
-* 國家
-* 語言
-* 拍攝地點(國家 + 州/省/縣)
-* 製作公司
+
