@@ -25,13 +25,13 @@ class Prime_content(scrapy.Spider):
 
 
 
-#    def parse2(self,response,url):
-#        rating_avg = response.css('.strong span').css('::text').extract_first()
+    def parse2(self,response,url):
+        rating_avg = response.css('.strong span').css('::text').extract_first()
         finalist = response.css('title::text').extract_first()
-#        time.sleep(3)
-#        yield {
-#               'rating_avg':rating_avg,
-#                'finalist':finalist
-#            }
+        time.sleep(3)
+        yield {
+               'rating_avg':rating_avg,
+                'finalist':finalist
+            }
 
 
