@@ -28,33 +28,68 @@ class Prime_content(scrapy.Spider):
     # about movie awarded
     def parse_movie(self, response):
         time.sleep(2)
-        rating_total = response.xpath('//*[@id="title-overview-widget"]/div[1]/div[2]/div/div[1]/div[1]/a/span/text()').get()
-        rating_avg = response.xpath('//*[@id="title-overview-widget"]/div[1]/div[2]/div/div[1]/div[1]/div[1]/strong/span/text()').get()
-        moive_description = response.css('.summary_text').css('::text').extract_first()
+        rating_total = response.xpath(
+            '//*[@id="title-overview-widget"]/div[1]/div[2]/div/div[1]/div[1]/a/span/text()').get()
+        rating_avg = response.xpath(
+            '//*[@id="title-overview-widget"]/div[1]/div[2]/div/div[1]/div[1]/div[1]/strong/span/text()').get()
+        motives_description = response.css('.summary_text').css('::text').extract_first()
         finalist = response.css('title::text').extract_first()
         cast = response.css('.primary_photo+ td a').css('::text').extract()
         language = response.xpath('//*[@id="titleDetails"]/div[2]/a/text()').extract_first()
-        style = response.xpath('//*[@id="titleStoryLine"]/div[3]/text()').extract()
+        country = response.css('.txt-block:nth-child(4) a').css('::text').get()
+        film_location = response.css('.txt-block:nth-child(8) .inline+ a').css('::text').get()
+        company = response.css('.subheading+ .txt-block a').css('::text').get()
+
+
+        # genres have many html style so set if come to handle this pro.
+        style_list = []
+        style1 = response.css('.txt-block~ .canwrap .inline+ a').css('::text').get()
+        if style1 is None:
+
+            style1 = response.css('.see-more.canwrap~ .canwrap .inline+ a').css('::text').get()
+            if style1 is None:
+                style1 = response.css('.canwrap a').css('::text').get()
+
+        style2 = response.css('.txt-block~ .canwrap a:nth-child(4)').css('::text').get()
+        if style2 is None:
+            style2 = response.css('.canwrap span+ a').css('::text').get()
+
+        style3 = response.css('.txt-block~ .canwrap a:nth-child(6)').css('::text').get()
+        if style3 is None:
+            style3 = response.css('.see-more.canwrap~ .canwrap a:nth-child(6)').css('::text').get()
+
+        style4 = response.css('.see-more.canwrap~ .canwrap a:nth-child(8)').css('::text').get()
+
+        style5 = response.css('.see-more.canwrap~ .canwrap a:nth-child(10)').css('::text').get()
+
+        style_list.append(style1)
+        style_list.append(style2)
+        style_list.append(style3)
+        style_list.append(style4)
+        style_list.append(style5)
+
         yield {
-            'rating_total':rating_total,
+            'rating_total': rating_total,
             'rating_avg': rating_avg,
             'finalist': finalist,
-            'movie_description':moive_description.strip(),
-            'cast':cast,
-            'language':language,
-            'style':style
+            'movie_description': motives_description.strip(),
+            'cast': cast,
+            'language': language,
+            'style': style_list,
+            'country':country,
+            'company':company,
+            'film_location':film_location
 
         }
 
-# for only people.
+    # for only people.
     def parse_men(self, response):
         awards_record = response.css('.split_0 .subnav_item_main:nth-child(2) .link').css(
             '::attr(href)').extract_first()
         url = response.urljoin(awards_record)
         yield scrapy.Request(url=url, callback=self.parse_award_info)
 
-
-# for only people.
+    # for only people.
     def parse_award_info(self, response):
         time.sleep(2)
         finalist = response.css('.parent a').css('::text').extract_first()
@@ -64,13 +99,8 @@ class Prime_content(scrapy.Spider):
             item_award = item.css('.award_category').css('::text').extract_first()
             award_description = item.css('.award_description').css('::text').extract_first()
             yield {
-                            'finalist':finalist,
-                            'year':years.strip(),
-                            'winner_Nominee':winner_Nominee,
-                            'item_award':item_award,
-                            'award_description':award_description.strip() }
-
-
-
-
-
+                'finalist': finalist,
+                'year': years.strip(),
+                'winner_Nominee': winner_Nominee,
+                'item_award': item_award,
+                'award_description': award_description.strip()}
