@@ -17,7 +17,8 @@ session = HTMLSession()
 def main():
     url_tomato = 'https://www.rottentomatoes.com/napi/search/all?type=tv&searchQuery={}'.format(show_name)
     query_response =  establish_session(url_tomato)
-    stuff = {}
+    stuff = {'Show':''}
+    
 
     if query_response.status_code == 200:
         
@@ -26,11 +27,9 @@ def main():
         
         season = 1
         season_main_page_url = show_main_page_url + '/s{}'.format(season)
-        page = 1
+        
        
         while establish_session(season_main_page_url).status_code == 200:
-            
-            print(season)
             
             check_prerelease = check_pre(season_main_page_url)
             name = []
@@ -48,46 +47,37 @@ def main():
                 
                 while check :
             
-                    #print('###################')
-                    #print('@@@@@@@@@@@@@')
-                    #print(reviews_page_link_by_season)
+                    
                     extract_reviews(review_page_html,name,org,content)
-                    #x = extract_reviews(review_page_html)
-                    #reviews = reviews.extend(x)
+                    
                 
                     page += 1
                     reviews_page_link_by_season = season_main_page_url + '/reviews?type=&sort=&page={}'.format(page)
                     review_page_html = get_seasons_reviews_page_html(reviews_page_link_by_season)
                     check = check_no_reviews(review_page_html)
 
-                for i in range(len(name)):
-                    review_keys = ['name', 'org', 'content']
-                    value = [name[i], org[i], content[i]]
-
-                    review_obj = dict(zip(review_keys,value))
-
-                    reviews.append(review_obj)
+                    assemble_reviews(reviews, name, org, content)
+                    info['Reviews'] = reviews
+                    stuff['Season {}'.format(season)] = info
 
 
 
 
-                info['Season'] = season
-                info['Reviews'] = reviews
-                info['Reviews'] = reviews
-                print(info)
-              
+                
+                
+                
+            
+                
+             
 
             season += 1
             season_main_page_url = show_main_page_url + '/s{}'.format(season)
                 
-
     
+     
 
-
-
-
-
-
+    print(stuff)
+    
 def establish_session(url):
     response = session.get(url, headers = header_agent)
 
@@ -124,7 +114,7 @@ def get_season_infos(season_main_page_link):
     '''
     This function will take TV Show's season info and output them in json format
     '''
-    info = {'Year':'', 'Season':'', 'User_ratings':'', 'audience_score':'', 'Critic_Ratings':'', 'tomatometer':'', 'consensus':'', 'Reviews':[]}
+    info = {'Year':'', 'User_ratings':'', 'audience_score':'', 'Critic_Ratings':'', 'tomatometer':'', 'consensus':'', 'Reviews':[]}
 
     html = establish_session(season_main_page_link).html
 
@@ -201,14 +191,19 @@ def extract_reviews(page_html,x,y,z):
             review['content'] = content.text
     '''
 
-    
-        
-          
-               
-
 def check_no_reviews(html):
     check = html.find('.critic__review-quote')
     return check
+
+
+def assemble_reviews(review_list, name_list, org_list, content_list):
+    for i in range(len(name_list)):
+                    review_keys = ['name', 'org', 'content']
+                    value = [name_list[i], org_list[i], content_list[i]]
+
+                    review_obj = dict(zip(review_keys,value))
+
+                    review_list.append(review_obj)
 
 #def get_season_rating():
 
