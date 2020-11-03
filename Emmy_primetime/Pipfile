@@ -46,5 +46,7 @@ twisted = "==20.3.0"
 urllib3 = "==1.25.10"
 w3lib = "==1.22.0"
 "zope.interface" = "==5.1.2"
+scrapy-fake-useragent = "*"
+
 [requires]
 python_version = "3.8"

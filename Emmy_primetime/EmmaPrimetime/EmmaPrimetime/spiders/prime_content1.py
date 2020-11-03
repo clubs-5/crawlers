@@ -4,17 +4,19 @@ from urllib.parse import urljoin
 import scrapy
 from scrapy_splash import SplashRequest
 
-
 class Prime_content(scrapy.Spider):
     name = 'Prime_content1'
-    allowed_domains = ['imdb.com']
-    start_url = ['https://www.imdb.com/event/ev0000223/2020/1/?ref_=ev_eh']
+    start_url = []
+    for i in range(2020,1948,-1):
+        url = 'https://www.imdb.com/event/ev0000223/{}/1/?ref_=ev_eh'.format(i)
+        start_url.append(url)
 
     def start_requests(self):
         for url in self.start_url:
-            yield SplashRequest(url=url, callback=self.parse, args={'wait': 5})
+            yield SplashRequest(url=url, callback=self.parse, args={'wait':6})
 
     def parse(self, response, **kwargs):
+        time.sleep(2)
         movies = response.css('.event-widgets__primary-nominees a').css('::attr(href)').extract()
         for movie in movies:
             if 'title' in movie:
@@ -32,14 +34,13 @@ class Prime_content(scrapy.Spider):
             '//*[@id="title-overview-widget"]/div[1]/div[2]/div/div[1]/div[1]/a/span/text()').get()
         rating_avg = response.xpath(
             '//*[@id="title-overview-widget"]/div[1]/div[2]/div/div[1]/div[1]/div[1]/strong/span/text()').get()
-        motives_description = response.css('.summary_text').css('::text').extract_first()
+        movies_description = response.css('.summary_text').css('::text').extract_first()
         finalist = response.css('title::text').extract_first()
         cast = response.css('.primary_photo+ td a').css('::text').extract()
         language = response.xpath('//*[@id="titleDetails"]/div[2]/a/text()').extract_first()
         country = response.css('.txt-block:nth-child(4) a').css('::text').get()
         film_location = response.css('.txt-block:nth-child(8) .inline+ a').css('::text').get()
         company = response.css('.subheading+ .txt-block a').css('::text').get()
-
 
         # genres have many html style so set if come to handle this pro.
         style_list = []
@@ -68,22 +69,24 @@ class Prime_content(scrapy.Spider):
         style_list.append(style4)
         style_list.append(style5)
 
+
         yield {
             'rating_total': rating_total,
             'rating_avg': rating_avg,
             'finalist': finalist,
-            'movie_description': motives_description.strip(),
+            'movie_description': movies_description.strip(),
             'cast': cast,
             'language': language,
             'style': style_list,
-            'country':country,
-            'company':company,
-            'film_location':film_location
+            'country': country,
+            'company': company,
+            'film_location': film_location
 
         }
 
     # for only people.
     def parse_men(self, response):
+        time.sleep(2)
         awards_record = response.css('.split_0 .subnav_item_main:nth-child(2) .link').css(
             '::attr(href)').extract_first()
         url = response.urljoin(awards_record)
