@@ -60,16 +60,6 @@ def main():
                     info['Reviews'] = reviews
                     stuff['Season {}'.format(season)] = info
 
-
-
-
-                
-                
-                
-            
-                
-             
-
             season += 1
             season_main_page_url = show_main_page_url + '/s{}'.format(season)
                 
@@ -177,19 +167,7 @@ def extract_reviews(page_html,x,y,z):
 
     for content in review_content:
         content_list.append(content.text)
-    
-
-        #for review in reviews:
-        #    review['org'] = 
-
-    '''
-    for review in reviews:
-        while review:
-            review['org'] = org.text
-    for content in review_content:
-        for review in reviews:
-            review['content'] = content.text
-    '''
+   
 
 def check_no_reviews(html):
     check = html.find('.critic__review-quote')
@@ -205,16 +183,8 @@ def assemble_reviews(review_list, name_list, org_list, content_list):
 
                     review_list.append(review_obj)
 
-#def get_season_rating():
 
-#def get_season_reviews():
-'''
-response =  establish_session(url_tomato)
-result_html_text = fetch_shows_search_page_html(response)
-show_main_page_link = get_show_main_page_link(result_html_text)
-    
-print(show_main_page_link)
-'''
+
 
 if __name__ == '__main__':
     main()
