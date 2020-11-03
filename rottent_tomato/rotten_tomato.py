@@ -19,37 +19,70 @@ def main():
     query_response =  establish_session(url_tomato)
     stuff = {}
 
-    while query_response.status_code == 200:
+    if query_response.status_code == 200:
         
         result_html = fetch_page_html(query_response)
         show_main_page_url = get_show_main_page_link(result_html)
         
         season = 1
         season_main_page_url = show_main_page_url + '/s{}'.format(season)
-        while establish_session(season_main_page_url).status_code == 200:
-            page = 1
-            info = get_season_infos(season_main_page_url)
-            
-
-            reviews_page_link_by_season = season_main_page_url + '/reviews?type=&sort=&page={}'.format(page)
-            review_page_html = get_seasons_reviews_page_html(reviews_page_link_by_season)
-        
-            extract_reviews(review_page_html)
-
-            page += 1
-
-        
-        #data = {}
+        page = 1
        
-        #if establish_session(season_main_page).status_code == 200:
+        while establish_session(season_main_page_url).status_code == 200:
+            
+            print(season)
+            
+            check_prerelease = check_pre(season_main_page_url)
+            name = []
+            org = []
+            content =[]
+            reviews = []
+            page = 1
+
+            if not check_prerelease:
+                info = get_season_infos(season_main_page_url)
+                reviews_page_link_by_season = season_main_page_url + '/reviews?type=&sort=&page={}'.format(page)
+                review_page_html = get_seasons_reviews_page_html(reviews_page_link_by_season)
+                check = check_no_reviews(review_page_html)
+                
+                
+                while check :
+            
+                    #print('###################')
+                    #print('@@@@@@@@@@@@@')
+                    #print(reviews_page_link_by_season)
+                    extract_reviews(review_page_html,name,org,content)
+                    #x = extract_reviews(review_page_html)
+                    #reviews = reviews.extend(x)
+                
+                    page += 1
+                    reviews_page_link_by_season = season_main_page_url + '/reviews?type=&sort=&page={}'.format(page)
+                    review_page_html = get_seasons_reviews_page_html(reviews_page_link_by_season)
+                    check = check_no_reviews(review_page_html)
+
+                for i in range(len(name)):
+                    review_keys = ['name', 'org', 'content']
+                    value = [name[i], org[i], content[i]]
+
+                    review_obj = dict(zip(review_keys,value))
+
+                    reviews.append(review_obj)
 
 
-        
 
-        
+
+                info['Season'] = season
+                info['Reviews'] = reviews
+                info['Reviews'] = reviews
+                print(info)
+              
+
+            season += 1
+            season_main_page_url = show_main_page_url + '/s{}'.format(season)
+                
+
     
-     
-   
+
 
 
 
@@ -79,11 +112,19 @@ def get_show_main_page_link(html):
 
     return urls[0]
 
+def check_pre(season_main_page_link):
+    html = establish_session(season_main_page_link).html
+
+    select_prerelease = html.find('.mop-ratings-wrap__prerelease-text')
+    
+    return select_prerelease
+
+
 def get_season_infos(season_main_page_link):
     '''
     This function will take TV Show's season info and output them in json format
     '''
-    info = {'Year':'','consensus':'', 'Critic_Ratings':'','tomatometer':'', 'User_ratings':'', 'audience_score':''}
+    info = {'Year':'', 'Season':'', 'User_ratings':'', 'audience_score':'', 'Critic_Ratings':'', 'tomatometer':'', 'consensus':'', 'Reviews':[]}
 
     html = establish_session(season_main_page_link).html
 
@@ -96,6 +137,7 @@ def get_season_infos(season_main_page_link):
     select_tomato = html.find('#tomato_meter_link > span.mop-ratings-wrap__percentage')
     tomatometer = select_tomato[0].text
     
+    
     select_critics = html.find('#topSection > div.tv-season-top-section__ratings-group > div > section > div.mop-ratings-wrap.score_panel.js-mop-ratings-wrap > section > section > div.mop-ratings-wrap__half.critic-score > div > small')
     critic_ratings = select_critics[0].text
 
@@ -107,7 +149,7 @@ def get_season_infos(season_main_page_link):
 
     info['Year'] = year
     info['consensus'] = consensus
-    info['Critic_Ratings'] = int(critic_ratings)
+    info['Critic_Ratings'] = critic_ratings
     info['tomatometer'] = int(re.findall(r'\d+',tomatometer)[0])
     info['User_ratings'] = int(re.findall(r'\d+',user_ratings)[0])
     info['audience_score'] = int(re.findall(r'\d+',audience_score)[0])
@@ -122,11 +164,51 @@ def get_seasons_reviews_page_html(url):
     html = establish_session(url).html
     return html
 
-def extract_reviews(page_html):
+def extract_reviews(page_html,x,y,z):
+
     review_content = page_html.find('.critic__review-quote' )
-    review_obj = {'name':'', 'org':'', 'content':''}
-    for i in review_content:
-        print(i.text)
+    critic_name = page_html.find('.critic__name')
+    critic_org = page_html.find('.critic__publication')
+   
+    
+   
+    name_list = x
+    org_list = y
+    content_list = z
+
+    
+    for name in critic_name:
+        
+        name_list.append(name.text)
+        
+    
+    for org in critic_org:
+        org_list.append(org.text)
+
+    for content in review_content:
+        content_list.append(content.text)
+    
+
+        #for review in reviews:
+        #    review['org'] = 
+
+    '''
+    for review in reviews:
+        while review:
+            review['org'] = org.text
+    for content in review_content:
+        for review in reviews:
+            review['content'] = content.text
+    '''
+
+    
+        
+          
+               
+
+def check_no_reviews(html):
+    check = html.find('.critic__review-quote')
+    return check
 
 #def get_season_rating():
 
