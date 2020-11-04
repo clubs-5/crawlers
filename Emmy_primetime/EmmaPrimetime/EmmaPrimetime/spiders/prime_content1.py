@@ -6,13 +6,10 @@ from scrapy_splash import SplashRequest
 
 class Prime_content(scrapy.Spider):
     name = 'Prime_content1'
-    start_url = []
-    for i in range(2020,1948,-1):
-        url = 'https://www.imdb.com/event/ev0000223/{}/1/?ref_=ev_eh'.format(i)
-        start_url.append(url)
-
+    start_url = ['https://www.imdb.com/event/ev0000223/2020/1/?ref_=ev_eh']
+    page_years = 2019
     def start_requests(self):
-        for url in self.start_url:
+      for url in self.start_url:
             yield SplashRequest(url=url, callback=self.parse, args={'wait':6})
 
     def parse(self, response, **kwargs):
@@ -26,6 +23,13 @@ class Prime_content(scrapy.Spider):
             elif 'name' in movie:
                 url_2 = response.urljoin(movie)
                 yield scrapy.Request(url=url_2, callback=self.parse_men)
+
+        next_page = "https://m.imdb.com/event/ev0000223/" + str(Prime_content.page_years) + "/1/?ref_=ev_eh"
+        if Prime_content.page_years >=1940:
+            Prime_content.page_years-=1
+            time.sleep(20)
+            yield response.follow(next_page,callback=self.parse)
+
 
     # about movie awarded
     def parse_movie(self, response):
@@ -74,7 +78,7 @@ class Prime_content(scrapy.Spider):
             'rating_total': rating_total,
             'rating_avg': rating_avg,
             'finalist': finalist,
-            'movie_description': movies_description.strip(),
+            'movie_description': movies_description,
             'cast': cast,
             'language': language,
             'style': style_list,
