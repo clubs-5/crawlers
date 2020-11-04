@@ -10,7 +10,7 @@ class Prime_content(scrapy.Spider):
     page_years = 2019
     def start_requests(self):
       for url in self.start_url:
-            yield SplashRequest(url=url, callback=self.parse, args={'wait':6})
+            yield SplashRequest(url=url, callback=self.parse, args={'wait':5})
 
     def parse(self, response, **kwargs):
         time.sleep(2)
@@ -22,13 +22,8 @@ class Prime_content(scrapy.Spider):
 
             elif 'name' in movie:
                 url_2 = response.urljoin(movie)
-                yield scrapy.Request(url=url_2, callback=self.parse_men)
+                yield scrapy.Request(url=url_2, callback=self.parse_men and self.next_years)
 
-        next_page = "https://m.imdb.com/event/ev0000223/" + str(Prime_content.page_years) + "/1/?ref_=ev_eh"
-        if Prime_content.page_years >=1940:
-            Prime_content.page_years-=1
-            time.sleep(20)
-            yield response.follow(next_page,callback=self.parse)
 
 
     # about movie awarded
@@ -111,3 +106,10 @@ class Prime_content(scrapy.Spider):
                 'winner_Nominee': winner_Nominee,
                 'item_award': item_award,
                 'award_description': award_description.strip()}
+
+    def next_years(self,response):
+        next_page = "https://m.imdb.com/event/ev0000223/" + str(Prime_content.page_years) + "/1/?ref_=ev_eh"
+        if Prime_content.page_years >= 1949:
+            Prime_content.page_years-= 1
+            time.sleep(5)
+            yield scrapy.Request(next_page,callback=self.parse)
