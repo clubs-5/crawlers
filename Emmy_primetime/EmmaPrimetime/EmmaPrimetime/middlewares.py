@@ -7,6 +7,7 @@ from scrapy import signals
 
 # useful for handling different item types with a single interface
 from itemadapter import is_item, ItemAdapter
+from fake_useragent import UserAgent
 
 
 class EmmaprimetimeSpiderMiddleware:
@@ -101,3 +102,9 @@ class EmmaprimetimeDownloaderMiddleware:
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+
+
+class RandomUserAgentMiddleware(object):
+    def process_request(self, request, spider):
+        ua = UserAgent()
+        request.headers['User-Agent'] = ua.random
