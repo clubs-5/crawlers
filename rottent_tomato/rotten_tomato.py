@@ -3,18 +3,24 @@
 from requests_html import HTMLSession
 import re
 import json
+import os
 
 
-show_name = input("give me a show name:")
+name = input("give me a show name:")
 
 header_agent = {
     'User-Agent' : 'Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:78.0) Gecko/20100101 Firefox/78.0'
 }
 
 session = HTMLSession()
-
-
 def main():
+    with open('results.json','a') as obj:
+    info_object = show_full_info(name)
+    obj.write(info_object)
+    obj.close()
+
+
+def show_full_info(show_name):
     url_tomato = 'https://www.rottentomatoes.com/napi/search/all?type=tv&searchQuery={}'.format(show_name)
     query_response =  establish_session(url_tomato)
     stuff = {'Show':''}
@@ -58,6 +64,7 @@ def main():
 
                     assemble_reviews(reviews, name, org, content)
                     info['Reviews'] = reviews
+                    stuff['Show'] = show_name
                     stuff['Season {}'.format(season)] = info
 
             season += 1
@@ -66,7 +73,7 @@ def main():
     
      
 
-    print(stuff)
+    return stuff
     
 def establish_session(url):
     response = session.get(url, headers = header_agent)
@@ -149,8 +156,6 @@ def extract_reviews(page_html,x,y,z):
     review_content = page_html.find('.critic__review-quote' )
     critic_name = page_html.find('.critic__name')
     critic_org = page_html.find('.critic__publication')
-   
-    
    
     name_list = x
     org_list = y
