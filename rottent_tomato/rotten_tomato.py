@@ -15,9 +15,9 @@ header_agent = {
 session = HTMLSession()
 def main():
     with open('results.json','a') as obj:
-    info_object = show_full_info(name)
-    obj.write(info_object)
-    obj.close()
+        info_object = show_full_info(name)
+        obj.write(info_object)
+        obj.close()
 
 
 def show_full_info(show_name):
