@@ -4,9 +4,12 @@ from requests_html import HTMLSession
 import re
 import json
 import os
+import pandas as pd 
 
+df = pd.read_csv('./sample.csv')
+show_list = df.name.to_list()
 
-name = input("give me a show name:")
+#show_name = input("give me a show name:")
 
 header_agent = {
     'User-Agent' : 'Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:78.0) Gecko/20100101 Firefox/78.0'
@@ -14,24 +17,31 @@ header_agent = {
 
 session = HTMLSession()
 def main():
-    with open('results.json','a') as obj:
-        info_dcit = show_full_info(name)
-        info_json_string = json.dumps(info_dcit)
-        obj.write(info_json_string)
-        obj.close()
+    for show_name in show_list:
+        print(show_name)
 
+        with open('results.json','a') as obj:
+            url_tomato = 'https://www.rottentomatoes.com/napi/search/all?type=tv&searchQuery={}'.format(show_name)
+            print(url_tomato)
+            query_response =  establish_session(url_tomato)
+            if query_response.status_code == 200:
+                result_html = fetch_page_html(query_response)
+                show_main_page_url = get_show_main_page_link(result_html)
+                if not show_main_page_url:
+                    print('Empty URL')
+                    pass
+                else:
+                    info_dict = show_full_info(show_main_page_url, show_name)
+                    info_json_string = json.dumps(info_dict)
+                    obj.write(info_json_string)
+                    obj.close()
+            else:
+                pass
 
-def show_full_info(show_name):
-    url_tomato = 'https://www.rottentomatoes.com/napi/search/all?type=tv&searchQuery={}'.format(show_name)
-    query_response =  establish_session(url_tomato)
-    stuff = {'Show':''}
+def show_full_info(show_main_page_url, show_name):
+
     
-
-    if query_response.status_code == 200:
-        
-        result_html = fetch_page_html(query_response)
-        show_main_page_url = get_show_main_page_link(result_html)
-        
+        stuff = {'Show':''}        
         season = 1
         season_main_page_url = show_main_page_url + '/s{}'.format(season)
         
@@ -70,11 +80,10 @@ def show_full_info(show_name):
 
             season += 1
             season_main_page_url = show_main_page_url + '/s{}'.format(season)
-                
-    
-     
+        return stuff        
+    #else:
 
-    return stuff
+    
     
 def establish_session(url):
     response = session.get(url, headers = header_agent)
@@ -97,8 +106,11 @@ def fetch_page_html(res):
 def get_show_main_page_link(html):
     s = html.text
     urls = re.findall(r"https://rottentomatoes.com/tv/\w+", s)
-
-    return urls[0]
+    if not urls:
+        return urls
+    else:
+        return urls[0]    
+    
 
 def check_pre(season_main_page_link):
     html = establish_session(season_main_page_link).html
@@ -144,8 +156,6 @@ def get_season_infos(season_main_page_link):
     
 
     return info
-    
-
 
 def get_seasons_reviews_page_html(url):
     
