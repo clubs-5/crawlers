@@ -6,8 +6,8 @@ import pandas as pd
 import time
 import random
 
-csv = input('Give me a csv file: ')
-df = pd.read_csv('./{}'.format(csv))
+csv_file_name = input('Give me a csv file name without extension: ')
+df = pd.read_csv('./{}.csv'.format(csv_file_name))
 show_list = df.name.to_list()
 
 
@@ -21,7 +21,7 @@ def main():
         print(show_name)
         sleep_time = random.randint(1,6)
         
-        with open('results.json','a') as obj:
+        with open('results_{}.json'.format(csv_file_name),'a') as obj:
             url_tomato = 'https://www.rottentomatoes.com/napi/search/all?type=tv&searchQuery={}'.format(show_name)
             print(url_tomato)
             query_response =  establish_session(url_tomato)
@@ -44,7 +44,7 @@ def main():
                         
             else:
                 pass
-        print(sleep_time)
+        print('Wait {} seconds'.format(sleep_time))
         time.sleep(sleep_time)
         session.close
 
