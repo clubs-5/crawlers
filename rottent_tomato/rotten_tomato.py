@@ -1,5 +1,3 @@
-#import requests
-#from bs4 import BeautifulSoup
 from requests_html import HTMLSession
 import re
 import json
@@ -8,7 +6,8 @@ import pandas as pd
 import time
 import random
 
-df = pd.read_csv('./sample.csv')
+csv = input('Give me a csv file: ')
+df = pd.read_csv('./{}'.format(csv))
 show_list = df.name.to_list()
 
 #show_name = input("give me a show name:")
@@ -86,7 +85,7 @@ def show_full_info(show_main_page_url, show_name):
             season += 1
             season_main_page_url = show_main_page_url + '/s{}'.format(season)
         return stuff        
-    #else:
+    
 
     
     
