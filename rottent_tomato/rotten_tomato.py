@@ -5,6 +5,7 @@ import re
 import json
 import os
 import pandas as pd 
+import time
 
 df = pd.read_csv('./sample.csv')
 show_list = df.name.to_list()
@@ -19,6 +20,7 @@ session = HTMLSession()
 def main():
     for show_name in show_list:
         print(show_name)
+        sleep_time = random.randint(1,6)
 
         with open('results.json','a') as obj:
             url_tomato = 'https://www.rottentomatoes.com/napi/search/all?type=tv&searchQuery={}'.format(show_name)
@@ -37,6 +39,8 @@ def main():
                     obj.close()
             else:
                 pass
+        print(sleep_time)
+        time.sleep(sleep_time)
 
 def show_full_info(show_main_page_url, show_name):
 
