@@ -6,6 +6,7 @@ import json
 import os
 import pandas as pd 
 import time
+import random
 
 df = pd.read_csv('./sample.csv')
 show_list = df.name.to_list()
