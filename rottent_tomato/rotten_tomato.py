@@ -32,10 +32,16 @@ def main():
                     print('Empty URL')
                     pass
                 else:
-                    info_dict = show_full_info(show_main_page_url, show_name)
-                    info_json_string = json.dumps(info_dict)
-                    obj.write(info_json_string)
-                    obj.close()
+                    try:
+                        info_dict = show_full_info(show_main_page_url, show_name)
+                        info_json_string = json.dumps(info_dict)
+                        obj.write(info_json_string)
+                        obj.close()
+                    except:
+                        with open('failed.txt', 'a') as f:
+                            f.write(show_name)
+                            f.close
+                        
             else:
                 pass
         print(sleep_time)
