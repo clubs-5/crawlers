@@ -39,7 +39,7 @@ def main():
                         obj.close()
                     except:
                         with open('failed.txt', 'a') as f:
-                            f.write(show_name)
+                            f.write('{}\n'.format(show_name))
                             f.close
                         
             else:
