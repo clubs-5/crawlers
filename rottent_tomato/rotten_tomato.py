@@ -10,6 +10,8 @@ csv_file_name = input('Give me a csv file name without extension: ')
 df = pd.read_csv('./{}.csv'.format(csv_file_name))
 show_list = df.name.to_list()
 
+dd = pd.read_csv('./ips.csvaa')
+ip_list = dd.to_list()
 
 header_agent = {
     'User-Agent' : 'Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:78.0) Gecko/20100101 Firefox/78.0'
@@ -96,7 +98,11 @@ def show_full_info(show_main_page_url, show_name):
     
     
 def establish_session(url):
-    response = session.get(url, headers = header_agent)
+    proxy_index = random.randint(0, len(ip_list)-1)
+    proxy = {
+        'http': ip_list[proxy_index], 'https': ip_list[proxy_index]
+    }
+    response = session.get(url, headers = header_agent, proxies=proxy)
 
     return response
 
