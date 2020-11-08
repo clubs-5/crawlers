@@ -9,8 +9,8 @@ import random
 csv_file_name = input('Give me a csv file name without extension: ')
 df = pd.read_csv('./{}.csv'.format(csv_file_name))
 show_list = df.name.to_list()
-
-dd = pd.read_csv('./ips.csvaa')
+ip_csv = input('Give me a ip csv file a,b,c or d: ')
+dd = pd.read_csv('./ips.csva{}'.format(ip_csv))
 ip_list = dd.to_list()
 
 header_agent = {
