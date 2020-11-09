@@ -1,77 +1,117 @@
-#import requests
-#from bs4 import BeautifulSoup
 from requests_html import HTMLSession
 import re
 import json
+import os
+import pandas as pd 
+import time
+import random
 
-
-show_name = input("give me a show name:")
+csv_file_name = input('Give me a csv file name without extension: ')
+df = pd.read_csv('./{}.csv'.format(csv_file_name))
+show_list = df.name.to_list()
+ip_csv = input('Give me a ip csv file a,b,c or d: ')
+dd = pd.read_csv('./ips.csva{}'.format(ip_csv))
+ip_list = dd.ip.to_list()
 
 header_agent = {
     'User-Agent' : 'Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:78.0) Gecko/20100101 Firefox/78.0'
 }
-
 session = HTMLSession()
 
-
 def main():
-    url_tomato = 'https://www.rottentomatoes.com/napi/search/all?type=tv&searchQuery={}'.format(show_name)
-    query_response =  establish_session(url_tomato)
-    stuff = {'Show':''}
+    for show_name in show_list:
+        print(show_name)
+        sleep_time = random.randint(1,6)
+        
+        url_tomato = 'https://www.rottentomatoes.com/napi/search/all?type=tv&searchQuery={}'.format(show_name)
+        print(url_tomato)
+        query_response =  establish_session(url_tomato)
+        
+        if query_response.status_code == 200:
+            result_html = fetch_page_html(query_response)
+            show_main_page_url = get_show_main_page_link(result_html)
+            if not show_main_page_url:
+                print('Empty URL')
+                pass
+            else:
+                try:
+                    # print('gg')
+                    with open('results_{}.json'.format(csv_file_name),'a') as obj:
+                        info_dict = show_full_info(show_main_page_url, show_name)
+                        info_json_string = json.dumps(info_dict)
+                        obj.write(info_json_string)
+                        obj.close()
+                except:
+                    # print('some exception')
+                    # pass
+                    with open('failed.txt', 'a') as f:
+                        f.write('{}\n'.format(show_name))
+                        f.close
+                    
+        else:
+            pass
+        print('Wait {} seconds'.format(sleep_time))
+        time.sleep(sleep_time)
+        session.close
+
+def show_full_info(show_main_page_url, show_name):
+
     
-
-    if query_response.status_code == 200:
-        
-        result_html = fetch_page_html(query_response)
-        show_main_page_url = get_show_main_page_link(result_html)
-        
+        stuff = {'Show':''}        
         season = 1
-        season_main_page_url = show_main_page_url + '/s{}'.format(season)
-        
-       
-        while establish_session(season_main_page_url).status_code == 200:
-            
-            check_prerelease = check_pre(season_main_page_url)
-            name = []
-            org = []
-            content =[]
-            reviews = []
-            page = 1
+        season_main_page_url = show_main_page_url + '/s{}'.format(season)   
+        check_prerelease = check_pre(season_main_page_url)
+        name = []
+        org = []
+        content =[]
+        reviews = []
+        page = 1
 
-            if not check_prerelease:
-                info = get_season_infos(season_main_page_url)
+        if not check_prerelease:
+            info = get_season_infos(season_main_page_url)
+            reviews_page_link_by_season = season_main_page_url + '/reviews?type=&sort=&page={}'.format(page)
+            review_page_html = get_seasons_reviews_page_html(reviews_page_link_by_season)
+            check = check_no_reviews(review_page_html)
+            
+            
+            while check :
+        
+                
+                extract_reviews(review_page_html,name,org,content)
+                
+            
+                page += 1
                 reviews_page_link_by_season = season_main_page_url + '/reviews?type=&sort=&page={}'.format(page)
                 review_page_html = get_seasons_reviews_page_html(reviews_page_link_by_season)
                 check = check_no_reviews(review_page_html)
-                
-                
-                while check :
-            
-                    
-                    extract_reviews(review_page_html,name,org,content)
-                    
-                
-                    page += 1
-                    reviews_page_link_by_season = season_main_page_url + '/reviews?type=&sort=&page={}'.format(page)
-                    review_page_html = get_seasons_reviews_page_html(reviews_page_link_by_season)
-                    check = check_no_reviews(review_page_html)
 
-                    assemble_reviews(reviews, name, org, content)
-                    info['Reviews'] = reviews
-                    stuff['Season {}'.format(season)] = info
+                assemble_reviews(reviews, name, org, content)
+                info['Reviews'] = reviews
+                stuff['Show'] = show_name
+                stuff['Season {}'.format(season)] = info
 
-            season += 1
-            season_main_page_url = show_main_page_url + '/s{}'.format(season)
-                
+        season += 1
+        season_main_page_url = show_main_page_url + '/s{}'.format(season)
+        return stuff        
     
-     
 
-    print(stuff)
+    
     
 def establish_session(url):
-    response = session.get(url, headers = header_agent)
+    #proxy_index = random.randint(0, len(ip_list)-1)
 
-    return response
+    for ip in ip_list:
+        try:
+            proxy = {
+                'http': ip, 'https': ip
+            }
+            response = session.get(url, headers = header_agent, proxies=proxy)
+            print(ip + ' is working!')
+            return response
+            
+        
+        except:
+            print(ip + ' not working. Trying a new one...')
 
 
 # get show's search result html
@@ -89,8 +129,11 @@ def fetch_page_html(res):
 def get_show_main_page_link(html):
     s = html.text
     urls = re.findall(r"https://rottentomatoes.com/tv/\w+", s)
-
-    return urls[0]
+    if not urls:
+        return urls
+    else:
+        return urls[0]    
+    
 
 def check_pre(season_main_page_link):
     html = establish_session(season_main_page_link).html
@@ -136,8 +179,6 @@ def get_season_infos(season_main_page_link):
     
 
     return info
-    
-
 
 def get_seasons_reviews_page_html(url):
     
@@ -149,8 +190,6 @@ def extract_reviews(page_html,x,y,z):
     review_content = page_html.find('.critic__review-quote' )
     critic_name = page_html.find('.critic__name')
     critic_org = page_html.find('.critic__publication')
-   
-    
    
     name_list = x
     org_list = y
