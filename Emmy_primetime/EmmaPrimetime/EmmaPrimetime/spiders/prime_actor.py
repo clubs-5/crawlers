@@ -6,9 +6,8 @@ from scrapy_splash import SplashRequest
 
 class Prime_content(scrapy.Spider):
     name = 'Prime_actor'
-    page_years =2019
     start_url = []
-    for i in range(2020,1990, -1):
+    for i in range(1989,1947, -1):
         url = f'https://www.imdb.com/event/ev0000223/{i}/1/?ref_=ev_eh'
         start_url.append(url)
 
@@ -49,8 +48,3 @@ class Prime_content(scrapy.Spider):
                 'winner_Nominee': winner_Nominee,
                 'item_award': item_award,
                 'award_description': award_description.strip()}
-
-        next_pages = "https://m.imdb.com/event/ev0000223/" + str(Prime_content.page_years) + "/1/?ref_=ev_eh"
-
-        if Prime_content.page_years >= 1940:
-            Prime_content.page_years -= 1
