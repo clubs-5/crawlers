@@ -71,7 +71,7 @@ def main():
                 
             except:
                 print("Taking a break from Rotten Tomato. Will resume in 5 mins")
-                time.sleep(5)
+                time.sleep(300)
                 print('Resuming...')
 
 
