@@ -19,6 +19,7 @@ header_agent = {
 session = HTMLSession()
 
 def main():
+    n = 0
     for show_name in show_list:
         start_time = time.time()
         print(show_name)
@@ -65,6 +66,8 @@ def main():
                 print('Wait {} seconds'.format(sleep_time))
                 time.sleep(sleep_time)
                 session.close
+                n += 1
+                print('{} Shows processed'.format(n))
                 elapsed_time = round(time.time() - start_time,1)
                 print('{} seconds elapsed'.format(elapsed_time))
                 break
