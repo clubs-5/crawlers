@@ -9,9 +9,9 @@ import random
 csv_file_name = input('Give me a csv file name without extension: ')
 df = pd.read_csv('./{}.csv'.format(csv_file_name))
 show_list = df.name.to_list()
-ip_csv = input('Give me a ip csv file a,b,c or d: ')
-dd = pd.read_csv('./ips.csva{}'.format(ip_csv))
-ip_list = dd.ip.to_list()
+#ip_csv = input('Give me a ip csv file a,b,c or d: ')
+# dd = pd.read_csv('./ip_list.csvaa')
+# ip_list = dd.ip.to_list()
 
 header_agent = {
     'User-Agent' : 'Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:78.0) Gecko/20100101 Firefox/78.0'
@@ -20,66 +20,90 @@ session = HTMLSession()
 
 def main():
     for show_name in show_list:
+        start_time = time.time()
         print(show_name)
-        sleep_time = random.randint(1,6)
+        sleep_time = random.randint(1,3)
         
         url_tomato = 'https://www.rottentomatoes.com/napi/search/all?type=tv&searchQuery={}'.format(show_name)
-        print(url_tomato)
-        query_response =  establish_session(url_tomato)
         
-        if query_response.status_code == 200:
-            result_html = fetch_page_html(query_response)
-            show_main_page_url = get_show_main_page_link(result_html)
-            if not show_main_page_url:
-                print('Empty URL')
-                pass
-            else:
-                try:
-                    # print('gg')
-                    with open('results_{}.json'.format(csv_file_name),'a') as obj:
-                        info_dict = show_full_info(show_main_page_url, show_name)
-                        info_json_string = json.dumps(info_dict)
-                        obj.write(info_json_string)
-                        obj.close()
-                except:
-                    # print('some exception')
-                    # pass
-                    with open('failed.txt', 'a') as f:
-                        f.write('{}\n'.format(show_name))
-                        f.close
-                    
-        else:
-            pass
-        print('Wait {} seconds'.format(sleep_time))
-        time.sleep(sleep_time)
-        session.close
+
+        #print('checking proxy')
+        #proxy_results = check_proxy(url_tomato)
+        #print('Done checking proxy')
+        #query_response =  proxy_results[0]
+        #proxy = proxy_results[1]
+        while True:
+            try :
+                print('Connecting to {}'.format(url_tomato))
+                query_response = establish_session(url_tomato)
+                print('Not banned yet!')
+                if query_response.status_code == 200:
+                    result_html = fetch_page_html(query_response)
+                    show_main_page_url = get_show_main_page_link(result_html)
+                    if not show_main_page_url:
+                        print('Empty URL')
+                        pass
+                    else:
+                        try:
+                            # print('gg')
+                            with open('results_{}.json'.format(csv_file_name),'a') as obj:
+                                print('Working on it now...')
+                                info_dict = show_full_info(show_main_page_url, show_name)
+                                info_json_string = json.dumps(info_dict)
+                                obj.write(info_json_string)
+                                obj.close() # doesn't need to use close method
+                        except:
+                            # print('some exception')
+                            # pass
+                            with open('failed.txt', 'a') as f:
+                                print('Nothing in here ...{}'.format(show_name))
+                                f.write('{}\n'.format(show_name))
+                                f.close # doesn't need to use close method
+                            
+                else:
+                    pass
+                print('Wait {} seconds'.format(sleep_time))
+                time.sleep(sleep_time)
+                session.close
+                elapsed_time = round(time.time() - start_time,1)
+                print('{} seconds elapsed'.format(elapsed_time))
+                break
+                
+            except:
+                print("Taking a break from Rotten Tomato. Will resume in 5 mins")
+                time.sleep(5)
+                print('Resuming...')
+
 
 def show_full_info(show_main_page_url, show_name):
 
     
-        stuff = {'Show':''}        
-        season = 1
-        season_main_page_url = show_main_page_url + '/s{}'.format(season)   
-        check_prerelease = check_pre(season_main_page_url)
+    stuff = {'Show':''}        
+    season = 1
+    season_main_page_url = show_main_page_url + '/s{}'.format(season)   
+    
+    while establish_session(season_main_page_url).status_code == 200:
+        check_prerelease = check_pre(season_main_page_url) #check to see if the season is available
         name = []
         org = []
         content =[]
         reviews = []
         page = 1
+        
+        print('Now working on season {}'.format(season))
 
         if not check_prerelease:
             info = get_season_infos(season_main_page_url)
             reviews_page_link_by_season = season_main_page_url + '/reviews?type=&sort=&page={}'.format(page)
             review_page_html = get_seasons_reviews_page_html(reviews_page_link_by_season)
-            check = check_no_reviews(review_page_html)
+            check = check_no_reviews(review_page_html) # check to see if there is any reviews on the review page
             
             
             while check :
-        
-                
+                sleep_time = random.randint(1,3)
+                print('working on page {}'.format(page))
                 extract_reviews(review_page_html,name,org,content)
-                
-            
+                            
                 page += 1
                 reviews_page_link_by_season = season_main_page_url + '/reviews?type=&sort=&page={}'.format(page)
                 review_page_html = get_seasons_reviews_page_html(reviews_page_link_by_season)
@@ -89,29 +113,46 @@ def show_full_info(show_main_page_url, show_name):
                 info['Reviews'] = reviews
                 stuff['Show'] = show_name
                 stuff['Season {}'.format(season)] = info
-
+                time.sleep(sleep_time)
+                
+        else:
+            print('Season {} is not available yet'.format(season))
+            break
+        
+        print('Season {} is done'.format(season))
         season += 1
         season_main_page_url = show_main_page_url + '/s{}'.format(season)
-        return stuff        
+        print('Season {} page response is {}'.format(season,establish_session(season_main_page_url).status_code))
+        #check_prerelease = check_pre(season_main_page_url)
+    return stuff        
     
-
+# def check_proxy(url):
+#     # ths function will check to see if the proxy ip is working and return both response and the ip
+#     for ip in ip_list:
+#         print('Going through ip list now...')
+#         try:
+#             proxy = {
+#                 'http': ip, 'https': ip
+#             }
+#             print('Trying...')
+#             response = session.get(url, headers = header_agent, proxies=proxy)
+#             print(ip + ' is working!')
+#             return response, proxy
+            
+        
+#         except:
+#             print(ip + ' not working. Trying a new one...')
     
     
 def establish_session(url):
-    #proxy_index = random.randint(0, len(ip_list)-1)
-
-    for ip in ip_list:
-        try:
-            proxy = {
-                'http': ip, 'https': ip
-            }
-            response = session.get(url, headers = header_agent, proxies=proxy)
-            print(ip + ' is working!')
-            return response
+    #this function will use the working proxy ip to establish session
+            
+    response = session.get(url, headers = header_agent)
+        
+    return response
             
         
-        except:
-            print(ip + ' not working. Trying a new one...')
+        
 
 
 # get show's search result html
