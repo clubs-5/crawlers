@@ -16,6 +16,6 @@ with open("omdb_all.json2",'w+',encoding='utf-8') as f1:
             if "Movie not found!" not in movie_get:
                 data = f1.write(json.dumps(movie_get,ensure_ascii=False,indent=1))
                 print(f' 第 {n} 筆資料爬取 ')
-                time.sleep(0.5)
+                time.sleep(0.8)
     except    json.decoder.JSONDecodeError:
         print('jsonDecodeerror')
