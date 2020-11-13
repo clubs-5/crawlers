@@ -6,7 +6,7 @@ import pandas as pd
 file = input('give me a csv file name only: ')
 df  = pd.read_csv('./{}.csv'.format(file))
 
-with open("omdb_all.json1",'w+',encoding='utf-8') as f1:
+with open("omdb_all.json2",'w+',encoding='utf-8') as f1:
     try:
         n = 0
         for i in df['name']:
