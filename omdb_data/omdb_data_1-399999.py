@@ -19,9 +19,12 @@ with open("omdb_all.json4",'w+',encoding='utf-8') as f1:
                 data = f1.write(json.dumps(movie_get,ensure_ascii=False,indent=1))
                 print(f' 第 {n} 筆資料爬取 ')
                 time.sleep(0.8)
-    except    json.decoder.JSONDecodeError:
+     except    json.decoder.JSONDecodeError:
         print('jsonDecodeerror')
+        continue
     except    requests.exceptions.ConnectionError:
         print('ConnectionError')
+        continue
     except   urllib3.connection.HTTPConnection:
         print('HTTPConnection')
+        continue
